@@ -1,30 +1,36 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../firebaseConfig';
 
 function Bulletin() {
-    return (
-        <>
-        <div className="carousel">
-        <div id="item1" className="carousel-item w-full">
-          <img src="https://img.daisyui.com/images/stock/photo-1625726411847-8cbb60cc71e6.jpg" className="w-full" />
-        </div> 
-        <div id="item2" className="carousel-item w-full">
-          <img src="https://img.daisyui.com/images/stock/photo-1609621838510-5ad474b7d25d.jpg" className="w-full" />
-        </div> 
-        <div id="item3" className="carousel-item w-full">
-          <img src="https://img.daisyui.com/images/stock/photo-1414694762283-acccc27bca85.jpg" className="w-full" />
-        </div> 
-        <div id="item4" className="carousel-item w-full">
-          <img src="https://img.daisyui.com/images/stock/photo-1665553365602-b2fb8e5d1707.jpg" className="w-full" />
-        </div>
-      </div> 
-      <div className="flex justify-center w-full py-2 gap-2">
-        <a href="#item1" className="btn btn-xs">1</a> 
-        <a href="#item2" className="btn btn-xs">2</a> 
-        <a href="#item3" className="btn btn-xs">3</a> 
-        <a href="#item4" className="btn btn-xs">4</a>
+  const [posts, setPosts] = useState([
+  ]);
+
+ useEffect(() => {
+    const fetchPosts = async () => {
+      const querySnapshot = await getDocs(collection(db, "posts"));
+      setPosts(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    };
+
+    fetchPosts();
+  }, []); 
+
+  return (
+    <div className="bulletin-board p-4">
+      <h2 className="text-2xl font-bold text-center mb-4">ข่าวสาร</h2>
+      <div className="bulletin-posts grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {posts.map(post => (
+          <div key={post.id} className="bulletin-post p-4 border rounded shadow-lg bg-white">
+            <h3 className="text-xl font-semibold">{post.title}</h3>
+            <p className="text-gray-700">{post.description}</p>
+            {post.cover && (
+              <img src={post.cover} alt={post.title} className="w-full h-48 object-cover mt-2" />
+            )}
+          </div>
+        ))}
       </div>
-    </>
-    )
+    </div>
+  );
 }
 
-export default Bulletin
+export default Bulletin;
