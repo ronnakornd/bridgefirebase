@@ -5,7 +5,7 @@ function Header() {
     return (
         <div className="navbar bg-primary fixed p-5 z-50">
             <div className="flex-1">
-                <a className="p-0 text-xl font-bold">Bridge the Gap School</a>
+                <a className="p-0 text-xl font-bold" href="/">Bridge the Gap School</a>
             </div>
             <div className="flex-none gap-2">
                 <div className="dropdown dropdown-end">

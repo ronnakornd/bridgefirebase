@@ -17,7 +17,7 @@ function Bulletin() {
 
   return (
     <div className="bulletin-board p-4">
-      <h2 className="text-2xl font-bold text-center mb-4">ข่าวสาร</h2>
+      <h2 className="text-3xl font-bold text-center mb-4">ข่าวสาร</h2>
       <div className="bulletin-posts grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {posts.map(post => (
           <div key={post.id} className="bulletin-post p-4 border rounded shadow-lg bg-white">
@@ -28,6 +28,9 @@ function Bulletin() {
             )}
           </div>
         ))}
+      </div>
+      <div className='p-5 w-full flex justify-center items-center'>
+        <a href="/newpost" className='btn capitalize btn-neutral'>new post</a>
       </div>
     </div>
   );
