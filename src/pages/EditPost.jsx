@@ -1,24 +1,50 @@
 import React, { useState, useEffect } from 'react';
-import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { useParams, useNavigate } from 'react-router-dom';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '../firebaseConfig';
 import QuillEditor from '../components/QuillEditor';
-
-function NewPost() {
+function EditPost() {
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [description, setDescription] = useState('');
-  const [imagePreviewUrl, setImagePreviewUrl] = useState('');
-  const [image, setImage] = useState(null);
+  const [cover, setCover] = useState(null);
+  const [description, setDescription] = useState(''); // Add this line
+  const [coverUrl, setCoverUrl] = useState('');
 
+  useEffect(() => {
+    const fetchPost = async () => {
+      const docRef = doc(db, 'posts', id);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const postData = docSnap.data();
+        setTitle(postData.title);
+        setContent(postData.content);
+        setDescription(postData.description); 
+        setCoverUrl(postData.cover);
+      } else {
+        console.error('No such document!');
+      }
+    };
+
+    fetchPost();
+  }, [id]);
+
+  const handleImageChange = (e) => {
+    if (e.target.files[0]) {
+      setCover(e.target.files[0]);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    let cover = '';
-    if (image) {
-      const storageRef = ref(storage, `images/${image.name}`);
-      const uploadTask = uploadBytesResumable(storageRef, image);
+    let newImageUrl = coverUrl;
+    if (cover) {
+      const storageRef = ref(storage, `images/${cover.name}`);
+      const uploadTask = uploadBytesResumable(storageRef, cover);
 
       uploadTask.on(
         'state_changed',
@@ -29,52 +55,29 @@ function NewPost() {
           console.error('Error uploading image:', error);
         },
         async () => {
-          cover = await getDownloadURL(uploadTask.snapshot.ref);
-          await addDoc(collection(db, "posts"), {
+          newImageUrl = await getDownloadURL(uploadTask.snapshot.ref);
+          await updateDoc(doc(db, 'posts', id), {
             title,
             content,
             description,
-            cover,
-            createdAt: Timestamp.now()
+            cover: newImageUrl,
           });
-          setTitle('');
-          setContent('');
-          setDescription('');
-          setImage(null);
+          navigate('/');
         }
       );
     } else {
-      await addDoc(collection(db, "posts"), {
+      await updateDoc(doc(db, 'posts', id), {
         title,
         content,
-        createdAt: Timestamp.now()
+        description,
+        imageUrl: newImageUrl,
       });
-      setTitle('');
-      setContent('');
+      navigate('/');
     }
   };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImage(file);
-      const url = URL.createObjectURL(file);
-      setImagePreviewUrl(url);
-    }
-  };
-
-
-  useEffect(() => {
-    // Cleanup function to revoke the object URL
-    return () => {
-      if (imagePreviewUrl) {
-        URL.revokeObjectURL(imagePreviewUrl);
-      }
-    };
-  }, [imagePreviewUrl]);
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-xl mx-auto py-32 px-5">
+    <form onSubmit={handleSubmit} className="max-w-xl mx-auto py-32 my-4">
       <div className="form-control">
         <label className="label" htmlFor="title">Title</label>
         <input
@@ -87,9 +90,9 @@ function NewPost() {
         />
       </div>
       <div className="form-control">
-        <label className="label" htmlFor="title">Description</label>
+        <label className="label" htmlFor="description">Description</label>
         <input
-          id="title"
+          id="description"
           type="text"
           className="input input-bordered"
           value={description}
@@ -106,16 +109,16 @@ function NewPost() {
         <input
           id="image"
           type="file"
-          className="file-input w-full max-w-xs"
+          className="file-input"
           onChange={handleImageChange}
         />
+        {coverUrl && <img src={coverUrl} alt="Current" className="w-full h-48 object-cover mt-2" />}
       </div>
-      {imagePreviewUrl && <img src={imagePreviewUrl} alt="Preview" className="mt-4" />}
       <div className="form-control mt-4">
-        <button type="submit" className="btn btn-primary">Add Post</button>
+        <button type="submit" className="btn btn-primary">Update Post</button>
       </div>
     </form>
   );
 }
 
-export default NewPost;
+export default EditPost;

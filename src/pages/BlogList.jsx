@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
-import { db } from "../firebaseConfig"; // Import db from firebaseConfig.js
-
+import { db } from "../firebaseConfig"; 
+import { convertTimestamp } from '../util/ConvertTime';
 const BlogList = () => {
     const [posts, setPosts] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -18,14 +18,6 @@ const BlogList = () => {
         fetchPosts();
     }, []);
 
-    const convertTimestamp = (timestamp) => {
-        let date = timestamp.toDate();
-        let mm = date.getMonth()+1;
-        let dd = date.getDate();
-        let yyyy = date.getFullYear();
-        date = dd + '/' + mm + '/' + yyyy;
-        return date;
-    }
 
     // Get current posts
     const indexOfLastPost = currentPage * postsPerPage;
@@ -39,14 +31,14 @@ const BlogList = () => {
         <div className='pt-40 pb-20 h-screen flex flex-col justify-between items-center gap-2 '>
             <div className=' flex flex-col items-center gap-2 w-full '>
                 {currentPosts.map((post) => (
-                    <div key={post.id} className='md:w-10/12 w-11/12 flex gap-2 items-center bg-base-300 p-2 rounded-xl shadow-md hover:bg-slate-300 cursor-pointer'>
+                    <a href={`/post/${post.id}`} key={post.id} className='md:w-10/12 w-11/12 flex gap-2 items-center bg-base-300 p-2 rounded-xl shadow-md hover:bg-slate-300 cursor-pointer'>
                         <img src={post.cover} alt="" className='w-1/4 h-20 object-cover' />
                         <div className='w-full'>
                         <h2 className='text-xl font-bold'>{post.title}</h2>
                         <p>{post.description}</p>
                         <p className='text-sm float-right'>{convertTimestamp(post.createdAt)}</p>
                         </div>
-                    </div>
+                    </a>
                 ))}
             </div>
             {/* Render pagination */}
