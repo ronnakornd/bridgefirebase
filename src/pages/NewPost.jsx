@@ -74,7 +74,19 @@ function NewPost() {
   }, [imagePreviewUrl]);
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-xl mx-auto py-32 px-5">
+    <form onSubmit={handleSubmit} className="w-4/4 md:w-3/4 mx-auto py-32 px-5">
+      <div className="w-full px-5 mb-2 bg-stone-300 rounded-xl shadow-md">
+        <div className="text-sm breadcrumbs">
+          <ul>
+            <li>
+              <a href="/">หน้าแรก</a>
+            </li>
+            <li>
+              <a className="link active">สร้างบทความ</a>
+            </li>
+          </ul>
+        </div>
+      </div>
       <div className="form-control">
         <label className="label" htmlFor="title">Title</label>
         <input

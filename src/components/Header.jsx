@@ -16,7 +16,7 @@ function Header() {
                     <div className="drawer-side">
                         <label htmlFor="my-drawer-4" aria-label="close sidebar" className="drawer-overlay"></label>
                         <ul className="menu  w-80 min-h-full bg-base-200 text-base-content">
-                            <li><a className='text-lg capitalize'>login</a></li>
+                            <li><a href="/login" className='text-lg capitalize'>login</a></li>
                         </ul>
                     </div>
                 </div>
