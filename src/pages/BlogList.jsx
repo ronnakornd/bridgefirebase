@@ -2,11 +2,13 @@ import React, { useState, useEffect } from "react";
 import { collection, getDocs, query, orderBy, deleteDoc, doc } from 'firebase/firestore';
 import { db } from "../firebaseConfig";
 import { convertTimestamp } from "../util/ConvertTime";
+import { useOutletContext } from "react-router-dom";
 const BlogList = () => {
   const [posts, setPosts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [postsPerPage] = useState(10);
   const [deletePost, setDeletePost] = useState(null);
+  const [user,setUser] = useOutletContext();
 
 
   useEffect(() => {
@@ -36,7 +38,7 @@ const BlogList = () => {
 
   return (
     <div className="pt-32 md:pt-40 pb-20 min-h-screen flex flex-col justify-between items-center gap-2 ">
-      <div className="hidden md:block md:w-10/12 w-11/12 px-5 bg-stone-300 rounded-xl shadow-md">
+      <div className="hidden md:block md:w-10/12 w-11/12 px-5 bg-stone-200 rounded-xl shadow-md">
         <div className="text-sm breadcrumbs">
           <ul>
             <li>
@@ -58,7 +60,9 @@ const BlogList = () => {
             <img src={post.cover} alt="" className="w-1/4 h-20 object-cover" />
             <div className="w-full">
               <h2 className="text-xl font-bold">{post.title}</h2>
-              <button onClick={(e)=> {e.stopPropagation(); e.preventDefault();setDeletePost(post);document.getElementById('delete_modal').showModal();}} className="btn btn-error btn-xs float-right">delete</button>
+              {user.role == "admin" &&
+                <button onClick={(e)=> {e.stopPropagation(); e.preventDefault();setDeletePost(post);document.getElementById('delete_modal').showModal();}} className="btn btn-error btn-xs float-right">delete</button>
+              }
               <p>{post.description}</p>
               <p className="text-sm float-right text-slate-400">
                 {convertTimestamp(post.createdAt)}

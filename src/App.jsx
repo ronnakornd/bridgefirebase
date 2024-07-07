@@ -11,25 +11,13 @@ import BlogList from './pages/BlogList';
 import Post from './pages/Post';
 import EditPost from './pages/EditPost';
 import Login from './pages/Login';
+import NewTeacher from './pages/NewTeacher';
 
 
 
 
 function App() {
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUser(user);
-      } else {
-        setUser(null);
-      }
-    });
-
-    return () => unsubscribe();
-  }, []);
-
+ 
   return (
     <>
       <BrowserRouter>
@@ -42,6 +30,7 @@ function App() {
               <Route path="/post/:id" element={<Post />} />
               <Route path="/editpost/:id" element={<EditPost />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/newteacher" element={<NewTeacher />} />
               <Route path="*" element={<NoPage />} />
             </Route>
           </Routes>

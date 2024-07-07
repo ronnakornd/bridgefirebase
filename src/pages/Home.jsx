@@ -1,6 +1,7 @@
 import React from 'react'
 import Bulletin from '../components/Bulletin'
 import SimpleParallax from "simple-parallax-js";
+import Teacher from "./Teacher";
 
 function Home() {
     return (
@@ -19,6 +20,9 @@ function Home() {
         </div>
         <div>
            <Bulletin></Bulletin>
+        </div>
+        <div>
+              <Teacher></Teacher>
         </div>
         </>
         
