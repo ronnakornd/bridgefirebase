@@ -3,7 +3,7 @@ import { collection, addDoc, Timestamp } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '../firebaseConfig';
 import QuillEditor from '../components/QuillEditor';
-
+import Breadcrumbs from '../components/Breadcrumbs';
 function NewTeacher() {
   const [name, setName] = useState('');
   const [subject, setSubject] = useState('');
@@ -77,19 +77,10 @@ function NewTeacher() {
   }, [imagePreviewUrl]);
 
   return (
-    <form onSubmit={handleSubmit} className="w-4/4 md:w-3/4 mx-auto py-32 px-5">
-      <div className="w-full px-5 mb-2 bg-stone-300 rounded-xl shadow-md">
-        <div className="text-sm breadcrumbs">
-          <ul>
-            <li>
-              <a href="/">หน้าแรก</a>
-            </li>
-            <li>
-              <a className="link active">เพิ่มผู้สอน</a>
-            </li>
-          </ul>
-        </div>
-      </div>
+    <div className="pt-24">
+    <Breadcrumbs items={[{ name: 'หน้าแรก', link: '/' }, { name: 'เพิ่มผู้สอน', link: '/newteacher' }]} />
+    <form onSubmit={handleSubmit} className="w-4/4 md:w-3/4 mx-auto py-24 px-5">
+      <div className="text-5xl font-bold">เพิ่มผู้สอน</div>
       <div className="form-control">
         <label className="label" htmlFor="title">ชื่อ</label>
         <input
@@ -134,9 +125,10 @@ function NewTeacher() {
       </div>
       {imagePreviewUrl && <img src={imagePreviewUrl} alt="Preview" className="mt-4" />}
       <div className="form-control mt-4">
-        <button type="submit" className="btn btn-primary">เพิ่มผู้สอน</button>
+        <button type="submit" className="btn btn-neutral">เพิ่มผู้สอน</button>
       </div>
     </form>
+    </div>
   );
 }
 

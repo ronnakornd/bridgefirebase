@@ -21,7 +21,7 @@ function Header(props) {
   return (
     <div className="navbar bg-primary fixed p-5 z-50">
       <div className="flex-1">
-        <a className="p-0 text-xl font-bold" href="/">
+        <a className="p-0 text-xl font-bold text-slate-200" href="/">
           Bridge the Gap School
         </a>
       </div>
@@ -29,7 +29,7 @@ function Header(props) {
         <div className="drawer drawer-end">
           <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
           <div className="drawer-content">
-            <label htmlFor="my-drawer-4" className="drawer-button btn ">
+            <label htmlFor="my-drawer-4" className="drawer-button btn btn-ghost ">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="32"
@@ -61,13 +61,13 @@ function Header(props) {
             {user != null && (
               <ul className="menu flex flex-col gap-2 items-center  w-80 min-h-full bg-base-200 text-base-content">
                 <li>
-                  <div href="/profile" className="text-lg lowercase p-5">
+                  <a href="/profile" className="text-lg lowercase p-5">
                     {user.username}
                     <div className=" badge badge-neutral">{user.role}</div>
-                  </div>
+                  </a>
                 </li>
                 <li>
-                  <div  onClick={handleLogout} className="text-lg capitalize btn btn-error btn-sm ">
+                  <div  onClick={handleLogout} className=" capitalize btn btn-error btn-sm btn-  ">
                     logout
                   </div>
                 </li>

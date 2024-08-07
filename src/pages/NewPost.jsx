@@ -3,6 +3,7 @@ import { collection, addDoc, Timestamp } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '../firebaseConfig';
 import QuillEditor from '../components/QuillEditor';
+import Breadcrumbs from '../components/Breadcrumbs';
 
 function NewPost() {
   const [title, setTitle] = useState('');
@@ -48,7 +49,7 @@ function NewPost() {
         title,
         content,
         createdAt: Timestamp.now()
-      });
+      }).then(() => {});
       setTitle('');
       setContent('');
     }
@@ -74,19 +75,10 @@ function NewPost() {
   }, [imagePreviewUrl]);
 
   return (
-    <form onSubmit={handleSubmit} className="w-4/4 md:w-3/4 mx-auto py-32 px-5">
-      <div className="w-full px-5 mb-2 bg-stone-300 rounded-xl shadow-md">
-        <div className="text-sm breadcrumbs">
-          <ul>
-            <li>
-              <a href="/">หน้าแรก</a>
-            </li>
-            <li>
-              <a className="link active">สร้างบทความ</a>
-            </li>
-          </ul>
-        </div>
-      </div>
+    <div className="py-24">
+      <Breadcrumbs items={[{name:'หน้าแรก',link:'/'},{name:'เขียนบทความ',link:'/newpost'}]} />
+    <form onSubmit={handleSubmit} className="w-4/4 md:w-3/4 mx-auto px-5 pt-24">
+      <div className='text-5xl font-bold'>บทความใหม่</div>
       <div className="form-control">
         <label className="label" htmlFor="title">Title</label>
         <input
@@ -124,9 +116,10 @@ function NewPost() {
       </div>
       {imagePreviewUrl && <img src={imagePreviewUrl} alt="Preview" className="mt-4" />}
       <div className="form-control mt-4">
-        <button type="submit" className="btn btn-primary">Add Post</button>
+        <button type="submit" className="btn btn-neutral">Add Post</button>
       </div>
     </form>
+    </div>
   );
 }
 

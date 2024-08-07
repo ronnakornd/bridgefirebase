@@ -27,7 +27,7 @@ const Teacher = () => {
   return (
     <div className="flex justify-center flex-col items-center">
       <div className="text-3xl font-bold">ครูผู้สอน</div>
-      <div className="w-full h-min-screen grid grid-cols-1 gap-4 mb-2 justify-center items-center">
+      <div className="w-full h-min-screen grid grid-cols-1 md:grid-cols-3 gap-4 mb-2 justify-center items-center">
         {teachers.map((teacher) => (
           <div className="flex justify-center items-center">
             <div
@@ -39,14 +39,14 @@ const Teacher = () => {
                 alt={teacher.name}
                 className="w-64 h-auto mb-4 rounded-xl"
               />
-              <h3 className="text-xl font-bold">{teacher.name}</h3>
-              <p className="text-gray-500">{teacher.education}</p>
-              <p className="text-gray-600">สอน{teacher.subject}</p>
+              <h3 className="text-xl font-bold text-center">{teacher.name}</h3>
+              <p className="text-gray-500 text-center">{teacher.education}</p>
+              <p className="text-gray-600 text-center">สอน{teacher.subject}</p>
             </div>
           </div>
         ))}
         <div className="w-full flex justify-center items-center">
-          <a href="/newteacher" className="btn btn-info btn-sm">
+          <a href="/newteacher" className="btn btn-neutral btn-sm">
             เพิ่มผู้สอน
           </a>
         </div>

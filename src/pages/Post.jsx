@@ -47,7 +47,7 @@ function Post() {
         </a>
         <h2 className="text-2xl font-bold">{post.title}</h2>
         <p className="text-sm mb-2">{convertTimestamp(post.createdAt)}</p>
-        {user.role == "admin" && (
+        {user && user.role == "admin" && (
           <a href={`/editpost/${id}`} className="btn btn-secondary btn-xs mb-5">
             แก้ไข
           </a>

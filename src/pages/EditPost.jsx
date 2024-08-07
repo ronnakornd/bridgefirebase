@@ -4,6 +4,7 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '../firebaseConfig';
 import QuillEditor from '../components/QuillEditor';
+import Breadcrumbs from '../components/Breadcrumbs';
 function EditPost() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -77,7 +78,9 @@ function EditPost() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-xl mx-auto py-32 my-4">
+    <div className="pt-24">
+    <form onSubmit={handleSubmit} className="max-w-xl mx-auto py-24 my-4">
+      <div className='text-5xl font-bold'>แก้ไขบทความ</div>
       <div className="form-control">
         <label className="label" htmlFor="title">Title</label>
         <input
@@ -115,9 +118,10 @@ function EditPost() {
         {coverUrl && <img src={coverUrl} alt="Current" className="w-full h-48 object-cover mt-2" />}
       </div>
       <div className="form-control mt-4">
-        <button type="submit" className="btn btn-primary">Update Post</button>
+        <button type="submit" className="btn btn-neutral">Update Post</button>
       </div>
     </form>
+    </div>
   );
 }
 

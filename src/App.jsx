@@ -12,6 +12,8 @@ import Post from './pages/Post';
 import EditPost from './pages/EditPost';
 import Login from './pages/Login';
 import NewTeacher from './pages/NewTeacher';
+import Profile from './pages/Profile';
+import Courses from './pages/Courses';
 
 
 
@@ -31,6 +33,8 @@ function App() {
               <Route path="/editpost/:id" element={<EditPost />} />
               <Route path="/login" element={<Login />} />
               <Route path="/newteacher" element={<NewTeacher />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/courses" element={<Courses />} />
               <Route path="*" element={<NoPage />} />
             </Route>
           </Routes>

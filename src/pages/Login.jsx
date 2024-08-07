@@ -56,8 +56,8 @@ function Login() {
   };
 
   return (
-    <div className="container mx-auto pt-40 pb-20">
-      <h1 className="text-2xl font-bold mb-4">{isRegistering ? 'Register' : 'Login'}</h1>
+    <div className="container mx-auto md:px-96 pt-40 pb-20">
+      <h1 className="text-3xl font-bold mb-4">{isRegistering ? 'ลงทะเบียน' : 'เข้าสู่ระบบ'}</h1>
       {isRegistering && (
         <div className="form-control mb-4">
           <label className="label" htmlFor="username">Username</label>
@@ -109,7 +109,7 @@ function Login() {
           required
         />
       </div>
-      
+      <div className='md:px-28'>
       <div className="form-control mb-4">
         {isRegistering ? (
           <button className="btn btn-primary" onClick={handleRegister}>Register</button>
@@ -118,13 +118,14 @@ function Login() {
         )}
       </div>
       <div className="form-control mb-4">
-        <button className="btn btn-warning" onClick={() => setIsRegistering(!isRegistering)}>
-          {isRegistering ? 'Switch to Login' : 'Switch to Register'}
-        </button>
-      </div>
-      <div className="form-control">
         <button className="btn btn-error" onClick={handleLogout}>Logout</button>
       </div>
+      <div className="form-control mb-4">
+        <button className="btn btn-ghost text-blue-700" onClick={() => setIsRegistering(!isRegistering)}>
+          {isRegistering ? 'เข้าสู่ระบบ' : 'ลงทะเบียน'}
+        </button>
+      </div>
+        </div>
     </div>
   );
 }

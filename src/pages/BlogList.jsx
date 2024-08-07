@@ -3,6 +3,7 @@ import { collection, getDocs, query, orderBy, deleteDoc, doc } from 'firebase/fi
 import { db } from "../firebaseConfig";
 import { convertTimestamp } from "../util/ConvertTime";
 import { useOutletContext } from "react-router-dom";
+import Breadcrumbs from "../components/Breadcrumbs";
 const BlogList = () => {
   const [posts, setPosts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -13,7 +14,7 @@ const BlogList = () => {
 
   useEffect(() => {
     const fetchPosts = async () => {
-        const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+        const q = query(collection(db, "posts"), orderBy("createdAt", "desc"), );
         const querySnapshot = await getDocs(q);
         setPosts(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
       };
@@ -37,32 +38,20 @@ const BlogList = () => {
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
-    <div className="pt-32 md:pt-40 pb-20 min-h-screen flex flex-col justify-between items-center gap-2 ">
-      <div className="hidden md:block md:w-10/12 w-11/12 px-5 bg-stone-200 rounded-xl shadow-md">
-        <div className="text-sm breadcrumbs">
-          <ul>
-            <li>
-              <a href="/">หน้าแรก</a>
-            </li>
-            <li>
-              <a className="link active">ข่าวสาร</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-      <div className=" flex flex-col items-center gap-2 w-full ">
+    <div className="pt-24 pb-20 min-h-screen flex flex-col justify-between items-center gap-2 ">
+      <Breadcrumbs items={[{name:'หน้าแรก',link:'/'},{name:'บทความ',link:'/bloglist'}]} />
+      <div className=" flex flex-col justify-start min-h-screen items-center pt-5 gap-2 w-full ">
         {posts.map((post) => (
           <a
             href={`/post/${post.id}`}
             key={post.id}
-            className="md:w-10/12 w-11/12 flex gap-2 items-center bg-base-300 p-2 rounded-xl shadow-md hover:bg-slate-300 cursor-pointer"
+            className="md:w-11/12 w-11/12 flex gap-2 items-center bg-base-200 p-5 rounded-xl shadow-lg hover:bg-slate-300 cursor-pointer"
           >
             <img src={post.cover} alt="" className="w-1/4 h-20 object-cover" />
             <div className="w-full">
-              <h2 className="text-xl font-bold">{post.title}</h2>
-              {user.role == "admin" &&
-                <button onClick={(e)=> {e.stopPropagation(); e.preventDefault();setDeletePost(post);document.getElementById('delete_modal').showModal();}} className="btn btn-error btn-xs float-right">delete</button>
-              }
+              <h2 className="text-2xl font-bold">{post.title}    {user && user.role == "admin" &&
+                <button className="mr-5" onClick={(e)=> {e.stopPropagation(); e.preventDefault();setDeletePost(post);document.getElementById('delete_modal').showModal();}} className="btn btn-error btn-xs float-right">delete</button>
+              }</h2>
               <p>{post.description}</p>
               <p className="text-sm float-right text-slate-400">
                 {convertTimestamp(post.createdAt)}
@@ -71,12 +60,11 @@ const BlogList = () => {
           </a>
         ))}
       </div>
-      {/* Render pagination */}
       <div>
         {Array.from({ length: Math.ceil(posts.length / postsPerPage) }).map(
           (_, index) => (
             <button
-              className="btn btn-circle btn-info"
+              className="btn btn-circle btn-neutral"
               key={index}
               onClick={() => paginate(index + 1)}
             >
