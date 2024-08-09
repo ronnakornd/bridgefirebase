@@ -14,7 +14,7 @@ import Login from './pages/Login';
 import NewTeacher from './pages/NewTeacher';
 import Profile from './pages/Profile';
 import Courses from './pages/Courses';
-
+import CourseEditor from './pages/CourseEditor';
 
 
 
@@ -35,6 +35,7 @@ function App() {
               <Route path="/newteacher" element={<NewTeacher />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/courses" element={<Courses />} />
+              <Route path="/courses/:courseId/edit" element={<CourseEditor />} />
               <Route path="*" element={<NoPage />} />
             </Route>
           </Routes>
