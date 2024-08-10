@@ -4,9 +4,10 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
 import Breadcrumbs from '../components/Breadcrumbs';
 import { useParams } from 'react-router-dom';
-import { collection, getDocs } from 'firebase/firestore';
-import Select from 'react-select';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { collection, getDocs, query, where, orderBy } from 'firebase/firestore';
+import InstructorManagement from '../components/InstructorManagement';
+import StudentManagement from '../components/StudentManagement';
+import SectionManagement from '../components/SectionManagement';
 
 const CourseEditor = () => {
   const [course, setCourse] = useState(null);
@@ -25,31 +26,41 @@ const CourseEditor = () => {
   const [newSectionDescription, setNewSectionDescription] = useState('');
   const { courseId } = useParams();
 
-  const fetchCourse = async () => {
-    const courseDoc = await getDoc(doc(db, 'courses', courseId));
-    if (courseDoc.exists()) {
-      const data = courseDoc.data();
-      setCourse(data);
-      setTitle(data.title);
-      setDescription(data.description);
-      setSubject(data.subject);
-      setLevel(data.level);
-      setCoverImagePreview(data.coverImage);
-      setInstructors(data.instructors || []);
-      setStudents(data.students || []);
-      setSections(data.sections || []);
-    }
-  };
+  useEffect(() => {
+    const fetchCourse = async () => {
+      const courseDoc = await getDoc(doc(db, 'courses', courseId));
+      if (courseDoc.exists()) {
+        const data = courseDoc.data();
+        setCourse(data);
+        setTitle(data.title);
+        setDescription(data.description);
+        setSubject(data.subject);
+        setLevel(data.level);
+        setCoverImagePreview(data.coverImage);
+        setInstructors(data.instructors || []);
+        setStudents(data.students || []);
+      }
+    };
+
+    fetchCourse();
+    fetchUsers();
+    fetchSections();
+  }, [courseId]);
 
   const fetchUsers = async () => {
     const usersSnapshot = await getDocs(collection(db, 'users'));
     setUsers(usersSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })));
   };
 
-  useEffect(() => {
-    fetchCourse();
-    fetchUsers();
-  }, [courseId]);
+  const fetchSections = async () => {
+    const q = query(collection(db, 'sections'), where('courseId', '==', courseId));
+    const querySnapshot = await getDocs(q);
+    const fetchedSections = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    setSections(fetchedSections.sort((a, b) => a.order - b.order));
+  };
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -65,19 +76,16 @@ const CourseEditor = () => {
     e.preventDefault();
     setUploading(true);
     try {
-      // Update the course data in Firestore
       await updateDoc(doc(db, 'courses', courseId), {
         title,
         description,
         subject,
         level,
         instructors,
-        students,
-        sections, // Include sections in the course update
+        students
       });
 
       if (coverImage) {
-        // If a new cover image is uploaded, delete the old image and upload the new one
         if (course.coverImage) {
           const oldImageRef = ref(storage, course.coverImage);
           await deleteObject(oldImageRef);
@@ -87,9 +95,7 @@ const CourseEditor = () => {
 
         uploadTask.on(
           'state_changed',
-          (snapshot) => {
-            // Optional: handle upload progress
-          },
+          (snapshot) => {},
           (error) => {
             console.error('Upload failed:', error);
             setUploading(false);
@@ -113,14 +119,6 @@ const CourseEditor = () => {
     }
   };
 
-  const handleInstructorChange = (selectedOptions) => {
-    setInstructors(selectedOptions.map(option => option.value));
-  };
-
-  const handleStudentChange = (selectedOptions) => {
-    setStudents(selectedOptions.map(option => option.value));
-  };
-
   const instructorOptions = users
     .filter(user => user.role === 'instructor')
     .map(user => ({
@@ -135,34 +133,12 @@ const CourseEditor = () => {
       label: user.name,
     }));
 
-  const handleAddSection = () => {
-    setSections([
-      ...sections,
-      { title: newSectionTitle, description: newSectionDescription }
-    ]);
-    setNewSectionTitle('');
-    setNewSectionDescription('');
+  const handleInstructorChange = (selectedOptions) => {
+    setInstructors(selectedOptions.map(option => option.value));
   };
 
-  const handleRemoveSection = (index) => {
-    setSections(sections.filter((_, i) => i !== index));
-  };
-
-  const handleSectionChange = (index, key, value) => {
-    const updatedSections = sections.map((section, i) => 
-      i === index ? { ...section, [key]: value } : section
-    );
-    setSections(updatedSections);
-  };
-
-  const onDragEnd = (result) => {
-    if (!result.destination) return;
-
-    const items = Array.from(sections);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-
-    setSections(items);
+  const handleStudentChange = (selectedOptions) => {
+    setStudents(selectedOptions.map(option => option.value));
   };
 
   return (
@@ -235,106 +211,28 @@ const CourseEditor = () => {
             <img src={coverImagePreview} alt="Cover Preview" className="w-24 h-24 mt-2" />
           )}
 
-          <h2 className="text-4xl font-bold mt-8">Manage Instructors</h2>
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-2">
-              <h3 className="text-xl">Instructors</h3>
-              <Select
-                isMulti
-                options={instructorOptions}
-                value={instructors.map(id => instructorOptions.find(option => option.value === id))}
-                onChange={handleInstructorChange}
-              />
-            </div>
-          </div>
+          <InstructorManagement 
+            instructors={instructors}
+            instructorOptions={instructorOptions}
+            handleInstructorChange={handleInstructorChange}
+          />
 
-          <h2 className="text-4xl font-bold mt-8">Manage Students</h2>
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-2">
-              <h3 className="text-xl">Students</h3>
-              <Select
-                isMulti
-                options={studentOptions}
-                value={students.map(id => studentOptions.find(option => option.value === id))}
-                onChange={handleStudentChange}
-              />
-            </div>
-          </div>
+          <StudentManagement 
+            students={students}
+            studentOptions={studentOptions}
+            handleStudentChange={handleStudentChange}
+          />
 
-          <h2 className="text-4xl font-bold mt-8">Manage Sections</h2>
-          <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable droppableId="sections">
-              {(provided) => (
-                <div
-                  {...provided.droppableProps}
-                  ref={provided.innerRef}
-                  className="flex flex-col gap-4"
-                >
-                  {sections.map((section, index) => (
-                    <Draggable key={index} draggableId={`section-${index}`} index={index}>
-                      {(provided) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          className="flex flex-col gap-2 bg-gray-100 p-3 rounded shadow"
-                        >
-                          <div className="flex justify-between items-center">
-                            <h3 className="text-xl">Section {index + 1}</h3>
-                            <button 
-                              type="button"
-                              className="btn btn-sm btn-error"
-                              onClick={() => handleRemoveSection(index)}
-                            >
-                              Remove
-                            </button>
-                          </div>
-                          <input
-                            type="text"
-                            placeholder="Section Title"
-                            className="input"
-                            value={section.title}
-                            onChange={(e) => handleSectionChange(index, 'title', e.target.value)}
-                          />
-                          <textarea
-                            placeholder="Section Description"
-                            className="input textarea"
-                            value={section.description}
-                            onChange={(e) => handleSectionChange(index, 'description', e.target.value)}
-                          />
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-          </DragDropContext>
-
-          <div className="flex flex-col gap-2 mt-4">
-            <h3 className="text-xl">Add New Section</h3>
-            <input
-              type="text"
-              placeholder="New Section Title"
-              className="input"
-              value={newSectionTitle}
-              onChange={(e) => setNewSectionTitle(e.target.value)}
-            />
-            <textarea
-              placeholder="New Section Description"
-              className="input textarea"
-              value={newSectionDescription}
-              onChange={(e) => setNewSectionDescription(e.target.value)}
-            />
-            <button 
-              type="button" 
-              className="btn btn-neutral mt-2"
-              onClick={handleAddSection}
-            >
-              Add Section
-            </button>
-          </div>
+          <SectionManagement 
+            sections={sections}
+            courseId={courseId}
+            newSectionTitle={newSectionTitle}
+            newSectionDescription={newSectionDescription}
+            setNewSectionTitle={setNewSectionTitle}
+            setNewSectionDescription={setNewSectionDescription}
+            fetchSections={fetchSections}
+            setSections={setSections}
+          />
 
           <button type="submit" className="btn btn-neutral w-1/4 self-center mt-8" disabled={uploading}>
             {uploading ? 'Uploading...' : 'Update Course'}
